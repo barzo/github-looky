@@ -1,0 +1,13 @@
+div.content
+
+  != partial('_profile')
+  != partial('_navi')
+
+  div.subcontent
+    h3 Gists
+
+    ul#gistList
+      li 
+        img(src='/images/3s.gif')
+
+  != partial('_footer')

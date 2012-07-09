@@ -1,0 +1,158 @@
+body {
+background:#FDF6E3;
+font:14px "Lucida Grande", Helvetica, Arial, sans-serif
+}
+
+a {
+color:#2AA198;
+text-decoration:none
+}
+
+a:hover {
+color:#389;
+text-decoration:none
+}
+
+div#examples {
+margin-top:15px
+}
+
+div#welcome {
+margin-top:200px;
+text-align:center
+}
+
+div#welcome div#form {
+margin-top:25px
+}
+
+div#welcome div#form input#user {
+margin-bottom:0!important
+}
+
+div.avatar img {
+width:50px
+}
+
+div.avatar,div.info {
+float:left
+}
+
+div.content,div.footer {
+margin:0 auto;
+width:1000px
+}
+
+div.footer {
+color:#999;
+font-size:11px;
+margin-bottom:20px;
+margin-top:40px;
+text-align:center
+}
+
+div.info {
+padding:7px 0 0 20px
+}
+
+div.navi {
+-moz-border-radius-bottomleft:4px;
+-moz-border-radius-bottomright:4px;
+-webkit-border-bottom-left-radius:4px;
+-webkit-border-bottom-right-radius:4px;
+-webkit-box-shadow:0 0 4px 0 #ccc;
+background:#fff;
+border:1px solid #ccc;
+border-bottom-left-radius:4px;
+border-bottom-right-radius:4px;
+border-top:none;
+box-shadow:0 0 4px 0 #ccc;
+color:#444;
+overflow:hidden
+}
+
+div.navi ul.navi li {
+border-right:1px solid #ccc;
+float:left;
+margin:0!important;
+overflow:hidden;
+padding:5px
+}
+
+div.navi ul.navi li a {
+padding:5px
+}
+
+div.profile {
+-webkit-box-shadow:0 0 4px 0 #ccc;
+background:#fff;
+border:1px solid #ccc;
+border-top:none;
+box-shadow:0 0 4px 0 #ccc;
+color:#444;
+overflow:hidden
+}
+
+div.repo-mini-desc {
+color:#8E9C9D;
+font-size:11px;
+margin-left:10px;
+padding:5px 0
+}
+
+div.repo-mini-desc span {
+margin-left:8px
+}
+
+div.subcontent {
+margin-top:20px
+}
+
+h1 {
+color:#D1B358
+}
+
+li,div.navi ul.navi {
+margin:0
+}
+
+li.follower img {
+background:#FFF;
+border:1px solid #DDD;
+float:left;
+margin-right:10px;
+margin-top:-3px;
+padding:1px;
+width:20px
+}
+
+li.home {
+border-left:1px solid #ccc;
+border-right:none!important;
+float:right!important
+}
+
+li.repo {
+border-bottom:1px solid #ccc;
+padding:5px
+}
+
+li.repo:hover {
+background:#F2F2D5
+}
+
+span.nickname,span.location,span.followers,span.publicRepos,span.publicGists,span.job {
+color:#ccc;
+font-size:11px;
+margin-right:9px
+}
+
+span.repo-desc-text {
+color:#8E9C9D;
+font-size:11px;
+font-style:italic
+}
+
+ul {
+list-style:none
+}

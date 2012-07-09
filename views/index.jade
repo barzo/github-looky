@@ -1,0 +1,15 @@
+div#welcome
+
+  h1 Type a Github username and click Go
+
+  div#form.input-append
+    input#user.input-medium.search-query(type='text', placeholder='a Github username')
+    button.btn(onclick='window.location = "user/" + $("input#user").val()') Go
+
+  div#examples
+    span Example: 
+    a(href='/user/needim') needim
+    , 
+    a(href='/user/defunkt') defunkt
+
+  != partial('_footer')
