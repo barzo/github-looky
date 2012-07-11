@@ -1,13 +1,38 @@
 div.content
 
-  != partial('_profile')
-  != partial('_navi')
+	!= partial('_profile')
+	!= partial('_navi')
 
-  div.subcontent
-    h3 Repositories
+	div.subcontent
+		h3 Repositories
 
-    ul#repoList
-      li 
-        img(src='/images/3s.gif')
+		ul#repoList
+			if !repos.length
+				li
+					div.alert Nothing found.
 
-  != partial('_footer')
+			each repo in repos
+				li.repo
+					a(href='/user/' + userDetail.login + '/repository/' + repo.name)
+						i.icon-github
+						= repo.name
+					span.repo-desc-text
+						if repo.description
+							= ' - ' + repo.description
+					div.repo-mini-desc
+						span
+							i.icon-bolt
+							if repo.language
+								= repo.language
+							else
+								abbr Unknown
+						span
+							i.icon-eye-open
+							= repo.watchers
+						span
+							i.icon-download-alt
+							= repo.forks
+
+
+
+	!= partial('_footer')

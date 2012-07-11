@@ -1,12 +1,17 @@
 div.profile
   div.avatar
-      img(src='/images/avatar.png')
+      img(src=userDetail.avatar_url)
   div.info
-      span.username
-        img(src='/images/3s.gif')
+      span.username= userDetail.name
+        span.nickname= userDetail.login
       br
-      span.location
-      span.job
+      span.location= userDetail.location
       span.followers
+        strong Followers: 
+        = userDetail.followers
       span.publicRepos
-      span.publicGist
+        strong Public Repos: 
+        = userDetail.public_repos
+      span.publicGists
+        strong Public Gists: 
+        = userDetail.public_gists

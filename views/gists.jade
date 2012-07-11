@@ -1,13 +1,39 @@
 div.content
 
-  != partial('_profile')
-  != partial('_navi')
+	!= partial('_profile')
+	!= partial('_navi')
 
-  div.subcontent
-    h3 Gists
+	div.subcontent
+		h3 Gists
 
-    ul#gistList
-      li 
-        img(src='/images/3s.gif')
+		ul#gistList
+			if !gists.length
+				li
+					div.alert Nothing found.
 
-  != partial('_footer')
+			each gist in gists
+				li.repo
+					a(href='/user/' + userDetail.login + '/gist/' + gist.id)
+						i.icon-github
+						if gist.description
+							= gist.description
+						else
+							Undefined
+						span.repo-desc-text  - 
+							each file in gist.files
+								span
+									i.icon-file
+									= file.filename
+						div.repo-mini-desc
+							span
+								i.icon-calendar
+								= gist.created_at
+							span
+								i.icon-calendar
+								= gist.updated_at
+							span
+								i.icon-comments
+								= gist.comments
+
+
+	!= partial('_footer')

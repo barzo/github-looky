@@ -1,10 +1,10 @@
 div.navi
   ul.navi
     li
-      a(href='/user/' + user + '/repositories') Repositories
+      a(href='/user/' + userDetail.login + '/repositories') Repositories
     li
-      a(href='/user/' + user + '/gists') Gists
+      a(href='/user/' + userDetail.login + '/gists') Gists
     li
-      a(href='/user/' + user + '/followers') Followers
+      a(href='/user/' + userDetail.login + '/followers') Followers
     li.home
       a(href='/') View another user

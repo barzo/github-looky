@@ -1,13 +1,20 @@
 div.content
 
-  != partial('_profile')
-  != partial('_navi')
+	!= partial('_profile')
+	!= partial('_navi')
 
-  div.subcontent
-    h3 Followers
+	div.subcontent
+		h3 Followers
 
-    ul#followerList
-      li 
-        img(src='/images/3s.gif')
-
-  != partial('_footer')
+		ul#followerList
+			if !followers.length
+				li
+					div.alert Nothing found.
+					
+			each follower in followers
+				li.repo.follower(id= 'follower_' + follower.id)
+					a(href='/user/' + follower.login)
+						img(src=follower.avatar_url)
+						=follower.login
+      
+	!= partial('_footer')

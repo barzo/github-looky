@@ -3,7 +3,8 @@ var express = require('express')
   , GitHubApi = require('github')
   , github = new GitHubApi({version: "3.0.0"})  
   , Cache2File = require('cache2file')
-  , cache = new Cache2File('./cache', 60000 * 60);
+  , cache = new Cache2File('./cache', 604800000) // one week
+  , dateutil = require('dateutil');
 
 var app = module.exports = express.createServer()
   , io = require('socket.io').listen(app);
@@ -25,112 +26,100 @@ app.configure('development', function(){
 app.configure('production', function(){
   var oneYear = 31557600000;
   app.use(express.static(__dirname + '/public', { maxAge: oneYear }));
-  app.use(express.errorHandler());
+  // app.use(express.errorHandler());
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
 io.sockets.on('connection', function (socket) {
  
-  socket.on('getRepos', function (data) {  
-    cache.get(data.user + '_repos', function (err, repos) {
-      if (!err) {
-        socket.emit('repos', { repos: JSON.parse(repos) });
-      }
-      else {      
-        github.repos.getFromUser({
-          user: data.user
-        }, function(err, repos) {
-            if (!err) {
-              cache.set(data.user + '_repos', JSON.stringify(repos));
-              socket.emit('repos', { repos: repos });
-              socket.emit('ratelimit', { meta: repos.meta });
-            }
-        });
-      }
-    });
-  });
-  
-  socket.on('getGists', function (data) {
-    cache.get(data.user + '_gists', function (err, gists) {
-      if (!err) {
-        socket.emit('gists', { gists: JSON.parse(gists) });
-      }
-      else {      
-        github.gists.getFromUser({
-          user: data.user
-        }, function(err, gists) {
-            if (!err) {
-              cache.set(data.user + '_gists', JSON.stringify(gists));
-              socket.emit('gists', { gists: gists });
-              socket.emit('ratelimit', { meta: gists.meta });
-            }
-        });
-      }
-    });  
-  });
-  
-  socket.on('getUser', function (data) {
-    cache.get(data.user + '_profile', function (err, detail) {
-      if (!err) {
-        socket.emit('userDetail', { detail: JSON.parse(detail) });
-      }
-      else {      
-        github.user.getFrom({
-          user: data.user
-        }, function(err, detail) {
-            if (!err) {
-              cache.set(data.user + '_profile', JSON.stringify(detail));
-              socket.emit('userDetail', { detail: detail });
-              socket.emit('ratelimit', { meta: detail.meta });
-            }
-        });
-      }
-    });
-  });
-  
-  socket.on('getFollowers', function (data) {
-    cache.get(data.user + '_followers', function (err, followers) {
-      if (!err) {
-        socket.emit('followers', { followers: JSON.parse(followers) });
-      }
-      else {      
-        github.user.getFollowers({
-          user: data.user
-        }, function(err, followers) {
-            if (!err) {
-              cache.set(data.user + '_followers', JSON.stringify(followers));
-              socket.emit('followers', { followers: followers });
-              socket.emit('ratelimit', { meta: followers.meta });
-            }
-        });
-      }
-    });
-  });
-  
 });
+
+function getData(key, apiClass, apiFunc, apiFuncParams, callback) {
+  cache.get(key, function (err, data) {
+    if (!err) {
+      callback(false, JSON.parse(data));
+    }
+    else { 
+      github[apiClass][apiFunc](apiFuncParams, function(err, data) {
+          if (!err) {
+            cache.set(key, JSON.stringify(data));
+            callback(false, data);
+          }
+          else {
+            callback(err, null);
+          }
+      });
+    }
+  });
+};
+
+function githubUser(req, res, next) {
+  getData(req.params.name + '_profile', 'user', 'getFrom', {user: req.params.name}, function(err, data) {
+
+    if (err) res.send('Error: getData failed! (user)');
+
+    req.userDetail = data;
+    next();
+  });
+};
 
 // Routes
 app.get('/', function(req, res) {
-  res.render('index', { title: "Nody" });
+  res.render('index', { title: "looky" });
 });
 
-app.get('/user/:name', function(req, res) {
-  res.render('profile', { title: "User: " + req.params.name, user: req.params.name });
+app.get('/user/:name', githubUser, function(req, res) {
+  res.redirect('/user/' + req.params.name + '/repositories');
 });
 
-app.get('/user/:name/repositories', function(req, res) {
-  res.render('profile', { title: "User: " + req.params.name, user: req.params.name });
+app.get('/user/:name/repositories', githubUser, function(req, res) {
+
+  getData(req.params.name + '_repos', 'repos', 'getFromUser', {user: req.params.name}, function(err, data) {
+
+    if (err) res.send('Error: getData failed! (repos)');
+
+    res.render('profile', {
+      title: "User: " + req.params.name,
+      userDetail: req.userDetail,
+      repos: data
+    });
+  });
+
 });
 
-app.get('/user/:name/gists', function(req, res) {
-  res.render('gists', { title: "User: " + req.params.name, user: req.params.name });
+app.get('/user/:name/gists', githubUser, function(req, res) {
+
+  getData(req.params.name + '_gists', 'gists', 'getFromUser', {user: req.params.name}, function(err, data) {
+
+    if (err) res.send('Error: getData failed! (gists)');
+
+    data.forEach(function(gist) {
+        gist.created_at = dateutil.format(new Date(gist.created_at), 'j.m.Y');
+        gist.updated_at = dateutil.format(new Date(gist.updated_at), 'j.m.Y');
+    });
+
+    res.render('gists', {
+      title: "User: " + req.params.name,
+      userDetail: req.userDetail,
+      gists: data
+    });
+  });
+
 });
 
-app.get('/user/:name/followers', function(req, res) {
-  res.render('followers', { title: "User: " + req.params.name, user: req.params.name });
-});
+app.get('/user/:name/followers', githubUser, function(req, res) {
 
-app.get('/user/:name/repository/:repo', function(req, res) {
-    res.render('repository', { title: "repository" + req.params.repo, user: req.params.user, repo: req.params.repo });
+  getData(req.params.name + '_followers', 'user', 'getFollowers', {user: req.params.name}, function(err, data) {
+
+    if (err) res.send('Error: getData failed! (followers)');
+
+    res.render('followers', {
+      title: "User: " + req.params.name,
+      userDetail: req.userDetail,
+      followers: data
+    });
+  });
+
 });
 
 app.listen(3000, function(){
