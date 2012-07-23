@@ -3,7 +3,7 @@ var express = require('express')
   , GitHubApi = require('github')
   , github = new GitHubApi({version: "3.0.0"})  
   , Cache2File = require('cache2file')
-  , cache = new Cache2File('./cache', 604800000) // one week
+  , cache = new Cache2File('./cache', 86400000) // one day
   , dateutil = require('dateutil');
 
 var app = module.exports = express.createServer()
@@ -122,6 +122,39 @@ app.get('/user/:name/followers', githubUser, function(req, res) {
 
 });
 
-app.listen(3000, function(){
+app.get('/user/:name/events', githubUser, function(req, res) {
+
+  getData(req.params.name + '_events', 'events', 'getFromUser', {user: req.params.name}, function(err, data) {
+
+    if (err) res.send('Error: getData failed! (user_events)');
+
+    res.render('events', {
+      title: "User: " + req.params.name,
+      userDetail: req.userDetail,
+      events: data
+    });
+  });
+
+});
+
+app.get('/user/:name/repository/:repo', githubUser, function(req, res) {
+
+  getData(req.params.name + '_repo_' + req.params.repo, 'events', 'getFromRepo', {user: req.params.name, repo: req.params.repo}, function(err, data) {
+
+    if (err) res.send('Error: getData failed! (followers)');
+
+    console.log(data);
+
+    res.render('repo_single', {
+      title: "User: " + req.params.name,
+      userDetail: req.userDetail,
+      repoName: req.params.repo,
+      repoEvents: data
+    });
+  });
+
+});
+
+app.listen(process.env['app_port'] || 3000, function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 });
